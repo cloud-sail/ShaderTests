@@ -1,10 +1,10 @@
 # ShaderTests
+Test experimental shaders and validate the renderer system
 
 ## Features
-- Basic Chess Rules
-- Blinn-Phong Shading
-- OBJ Model load and view
-- TCP/IP + IPv4 multiplayer chess game
+- PBR
+- Triplanar Mapping
+- SDF and Ray Marching
 
 ## Gallery
 > PBR with Direct Lighting  
