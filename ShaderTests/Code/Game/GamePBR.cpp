@@ -1,6 +1,7 @@
 #include "Game/GamePBR.hpp"
 #include "Game/SpectatorCamera.hpp"
 #include "Engine/Core/DebugRender.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
@@ -29,7 +30,7 @@ GamePBR::GamePBR()
 	m_cursorMode = CursorMode::FPS;
 
 	LoadModel();
-
+	LoadIBL();
 }
 
 GamePBR::~GamePBR()
@@ -67,6 +68,7 @@ void GamePBR::Render() const
 
 	g_theRenderer->BeginCamera(m_spectator->m_camera);
 	// World-space drawing
+	RenderSkybox();
 	RenderModel();
 	g_theRenderer->EndCamera(m_spectator->m_camera);
 	DebugRenderWorld(m_spectator->m_camera);
@@ -79,8 +81,8 @@ void GamePBR::Render() const
 
 void GamePBR::Reset()
 {
-	m_uvScale = 1.f;
-	m_blendSharpness = 1.f;
+	m_debugMetallic = 1.f;
+	m_debugRoughness = 0.f;
 }
 
 void GamePBR::OnWindowResized()
@@ -88,18 +90,34 @@ void GamePBR::OnWindowResized()
 	m_spectator->RefreshAspectRatio();
 }
 
+void GamePBR::LoadIBL()
+{
+	m_skyboxShader = g_theRenderer->CreateOrGetShader(ShaderConfig("Data/Shaders/Skybox"), VertexType::VERTEX_PCU);
+	m_skyboxTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/IBL/output_skybox.dds");
+
+	//m_brdfLutTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/IBL/ibl_brdf_lut.png");
+	m_brdfLutTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/IBL/brdf_lut.dds"); // seems reverted
+	m_irradianceTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/IBL/output_irradiance.dds");
+	m_radianceTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/IBL/output_radiance.dds");
+}
+
 void GamePBR::LoadModel()
 {
 	// Load model material
 	m_shader = g_theRenderer->CreateOrGetShader(ShaderConfig("Data/Shaders/PBR"), VertexType::VERTEX_PCUTBN);
 
-
 	m_sampler = SamplerMode::BILINEAR_WRAP;
-	m_albedoTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/fancy-scaled-gold/fancy-scaled-gold_albedo.png");
-	m_metallicRoughnessTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/fancy-scaled-gold/fancy-scaled-gold_arm.png");
-	m_normalTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/fancy-scaled-gold/fancy-scaled-gold_normal-ogl.png");
-	m_occlusionTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/fancy-scaled-gold/fancy-scaled-gold_arm.png");
-	m_emissiveTexture = nullptr;
+	//m_albedoTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/stylized-grass/stylized-grass_albedo.png");
+	//m_metallicRoughnessTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/stylized-grass/stylized-grass_arm.png");
+	//m_normalTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/stylized-grass/stylized-grass_normal-ogl.png");
+	//m_occlusionTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/stylized-grass/stylized-grass_arm.png");
+	//m_emissiveTexture = nullptr;
+
+	m_albedoTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/columned-lava-rock/columned-lava-rock_albedo.dds");
+	m_metallicRoughnessTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/columned-lava-rock/columned-lava-rock_ormh.dds");
+	m_normalTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/columned-lava-rock/columned-lava-rock_normal-ogl.dds");
+	m_occlusionTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/columned-lava-rock/columned-lava-rock_ormh.dds");
+	m_emissiveTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/columned-lava-rock/columned-lava-rock_emissive.dds");
 
 
 	// Load model shape
@@ -119,7 +137,7 @@ void GamePBR::LoadModel()
 
 void GamePBR::RenderModel() const
 {
-	PBRRenderResources resources;
+	TestPBRRenderResources resources;
 	resources.engineConstantsIndex = g_theRenderer->GetCurrentEngineConstantsIndex();
 	resources.cameraConstantsIndex = g_theRenderer->GetCurrentCameraConstantsIndex();
 	resources.modelConstantsIndex = g_theRenderer->GetCurrentModelConstantsIndex();
@@ -128,13 +146,20 @@ void GamePBR::RenderModel() const
 	resources.samplerIndex = g_theRenderer->GetDefaultSamplerIndex(m_sampler);
 
 	resources.albedoTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_albedoTexture, DefaultTexture::WhiteOpaque2D);
-	resources.metallicRoughnessTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_metallicRoughnessTexture, DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	resources.metallicRoughnessTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_metallicRoughnessTexture, DefaultTexture::DefaultORMHMap);
 	resources.normalTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_normalTexture, DefaultTexture::DefaultNormalMap);
-	resources.occlusionTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_occlusionTexture, DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	resources.occlusionTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_occlusionTexture, DefaultTexture::DefaultORMHMap);
 	resources.emissiveTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_emissiveTexture, DefaultTexture::BlackOpaque2D);
 
+	resources.radianceTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_radianceTexture);
+	resources.irradianceTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_irradianceTexture);
+	resources.brdfLutTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_brdfLutTexture);
 
-	g_theRenderer->SetGraphicsBindlessResources(sizeof(PBRRenderResources), &resources);
+	resources.debugMetallic = m_debugMetallic;
+	resources.debugRoughness = m_debugRoughness;
+
+
+	g_theRenderer->SetGraphicsBindlessResources(sizeof(TestPBRRenderResources), &resources);
 
 	g_theRenderer->BindShader(m_shader);
 	g_theRenderer->SetBlendMode(BlendMode::OPAQUE);
@@ -147,16 +172,38 @@ void GamePBR::RenderModel() const
 
 void GamePBR::ShowGameModeImGuiWindow()
 {
-	//if (ImGui::Begin("Triplanar Mapping"))
-	//{
-	//	if (ImGui::Button("Reset Scene"))
-	//	{
-	//		Reset();
-	//	}
+	if (ImGui::Begin("PBR"))
+	{
+		if (ImGui::Button("Reset Scene"))
+		{
+			Reset();
+		}
 
-	//	ImGui::SliderFloat("UV Scale", &m_uvScale, 0.1f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
-	//	ImGui::SliderFloat("Blend Sharpness", &m_blendSharpness, 0.1f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
-	//}
+		ImGui::SliderFloat("Debug Metallic", &m_debugMetallic, 0.0f, 1.0f, "%.3f");
+		ImGui::SliderFloat("Debug Roughness", &m_debugRoughness, 0.f, 1.0f, "%.3f");
+	}
 
-	//ImGui::End();
+	ImGui::End();
+}
+
+void GamePBR::RenderSkybox() const
+{
+	std::vector<Vertex_PCU> verts;
+	AddVertsForAABB3D(verts, AABB3(Vec3(-1.f, -1.f, -1.f), Vec3(1.f, 1.f, 1.f)));
+
+	g_theRenderer->SetModelConstants();
+
+	SkyboxRenderResources resources;
+	resources.cubeMapTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_skyboxTexture);
+	resources.cameraConstantsIndex = g_theRenderer->GetCurrentCameraConstantsIndex();
+	resources.modelConstantsIndex = g_theRenderer->GetCurrentModelConstantsIndex();
+
+	g_theRenderer->SetGraphicsBindlessResources(sizeof(SkyboxRenderResources), &resources);
+
+	g_theRenderer->BindShader(m_skyboxShader);
+	g_theRenderer->SetBlendMode(BlendMode::OPAQUE);
+	g_theRenderer->SetRasterizerMode(RasterizerMode::SOLID_CULL_NONE);
+	g_theRenderer->SetDepthMode(DepthMode::READ_WRITE_LESS_EQUAL);
+	g_theRenderer->SetRenderTargetFormats();
+	g_theRenderer->DrawVertexArray(verts);
 }

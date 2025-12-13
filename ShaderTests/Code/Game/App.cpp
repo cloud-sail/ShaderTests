@@ -4,6 +4,7 @@
 #include "Game/GameRayMarching.hpp"
 #include "Game/GameTriplanarMapping.hpp"
 #include "Game/GamePBR.hpp"
+#include "Game/GameTriplanarMaterialBlend.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/Clock.hpp"
@@ -279,6 +280,9 @@ Game* App::CreateNewGameForMode(GameMode mode)
 		break;
 	case GAME_MODE_PBR:
 		return new GamePBR();
+		break;
+	case GAME_MODE_TRIPLANAR_MAT_BLEND:
+		return new GameTriplanarMaterialBlend();
 		break;
 	}
 	ERROR_AND_DIE("Invalid Game Mode");

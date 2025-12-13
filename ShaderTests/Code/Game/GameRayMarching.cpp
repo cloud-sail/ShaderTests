@@ -379,7 +379,7 @@ void GameRayMarching::RenderRayMarching() const
 	FullScreenQuadWithDepthResources fullScreenQuadWithDepthRes;
 	fullScreenQuadWithDepthRes.textureIndex = m_rayMarchingSRV.m_index;
 	fullScreenQuadWithDepthRes.depthTexIndex = m_rayMarchingDepthSRV.m_index;
-	fullScreenQuadWithDepthRes.samplerIndex = g_theRenderer->GetDefaultSamplerIndex(SamplerMode::BILINEAR_CLAMP);
+	fullScreenQuadWithDepthRes.samplerIndex = g_theRenderer->GetDefaultSamplerIndex(SamplerMode::POINT_CLAMP); // Full Screen Quad use point sampling if sizes are same
 
 	g_theRenderer->SetGraphicsBindlessResources(sizeof(FullScreenQuadWithDepthResources), &fullScreenQuadWithDepthRes);
 
@@ -523,9 +523,9 @@ void GameRayMarching::SpawnSphere()
 	const int matID = rng.RollRandomIntInRange(0, NUM_TRIPLANAR_TEX - 1);
 
 	newSphere->m_triAlbedoTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triAlbedoTexs[matID], DefaultTexture::CheckerboardMagentaBlack2D);
-	newSphere->m_triMRTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triMRTexs[matID], DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	newSphere->m_triMRTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triMRTexs[matID], DefaultTexture::DefaultORMHMap);
 	newSphere->m_triNormalTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triNormalTexs[matID], DefaultTexture::DefaultNormalMap);
-	newSphere->m_triOcclusionTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triOcclusionTexs[matID], DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	newSphere->m_triOcclusionTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triOcclusionTexs[matID], DefaultTexture::DefaultORMHMap);
 	newSphere->m_triEmissiveTexID = g_theRenderer->GetSrvIndexFromLoadedTexture(m_triEmissiveTexs[matID], DefaultTexture::BlackOpaque2D);
 
 	newSphere->m_color = Rgba8::MakeFromZeroToOne(rng.RollRandomFloatZeroToOne());

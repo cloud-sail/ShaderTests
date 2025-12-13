@@ -36,6 +36,10 @@ void Game::UpdateDeveloperCheats()
 	{
 		m_clock->StepSingleFrame();
 	}
+	if (g_theInput->WasKeyJustPressed(KEYCODE_F11))
+	{
+		Window::s_mainWindow->ToggleFullscreen();
+	}
 }
 
 void Game::UpdatePerFrameConstants()
@@ -57,7 +61,7 @@ void Game::ShowCommonImGuiWindow()
 		ImGui::Checkbox("Light Control Window", &m_showLightControlWindow);
 		ImGui::InputInt("debug int", &m_debugInt, 1);
 		ImGui::DragFloat("debug float", &m_debugFloat);
-		ImGui::Text("F1 - Toggle Debug Draw\nF6 - previous scene\nF7 - next scene\nF8 - reset\nT - Slow motion\nP - Toggle Pause\nO - Step Single Frame");
+		ImGui::Text("F1 - Toggle Debug Draw\nF6 - previous scene\nF7 - next scene\nF8 - reset\nF11 - Toggle Fullscreen\nT - Slow motion\nP - Toggle Pause\nO - Step Single Frame");
 	}
 
 

@@ -99,6 +99,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,6 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +147,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +171,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -197,6 +201,7 @@
     <ClCompile Include="GamePBR.cpp" />
     <ClCompile Include="GameRayMarching.cpp" />
     <ClCompile Include="GameTriplanarMapping.cpp" />
+    <ClCompile Include="GameTriplanarMaterialBlend.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Prop.cpp" />
@@ -212,6 +217,7 @@
     <ClInclude Include="GamePBR.hpp" />
     <ClInclude Include="GameRayMarching.hpp" />
     <ClInclude Include="GameTriplanarMapping.hpp" />
+    <ClInclude Include="GameTriplanarMaterialBlend.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Prop.hpp" />
     <ClInclude Include="SpectatorCamera.hpp" />

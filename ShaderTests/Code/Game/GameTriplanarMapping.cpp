@@ -115,7 +115,7 @@ void GameTriplanarMapping::LoadModel()
 	std::vector<unsigned int> indexes;
 
 	AddVertsForSphere3D(verts, indexes, Vec3(5.f, 4.f, 2.f), 1.f);
-	AddVertsForAABB3D(verts, indexes, AABB3(Vec3(2.f, 2.f, 0.f), Vec3(3.f, 3.f, 1.f)));
+	AddVertsForAABB3D(verts, indexes, AABB3(Vec3(2.5f, 2.5f, 0.f), Vec3(3.5f, 3.5f, 1.f)));
 
 	g_theRenderer->CopyCPUToGPU(verts.data(), static_cast<unsigned int>(verts.size()) * m_vertexBuffer->GetStride(), m_vertexBuffer);
 	g_theRenderer->CopyCPUToGPU(indexes.data(), static_cast<unsigned int>(indexes.size()) * m_indexBuffer->GetStride(), m_indexBuffer);
@@ -160,9 +160,9 @@ void GameTriplanarMapping::RenderPBRModel() const
 	resources.samplerIndex = g_theRenderer->GetDefaultSamplerIndex(m_sampler);
 
 	resources.albedoTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_albedoTexture, DefaultTexture::WhiteOpaque2D);
-	resources.metallicRoughnessTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_metallicRoughnessTexture, DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	resources.metallicRoughnessTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_metallicRoughnessTexture, DefaultTexture::DefaultORMHMap);
 	resources.normalTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_normalTexture, DefaultTexture::DefaultNormalMap);
-	resources.occlusionTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_occlusionTexture, DefaultTexture::DefaultOcclusionRoughnessMetalnessMap);
+	resources.occlusionTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_occlusionTexture, DefaultTexture::DefaultORMHMap);
 	resources.emissiveTextureIndex = g_theRenderer->GetSrvIndexFromLoadedTexture(m_emissiveTexture, DefaultTexture::BlackOpaque2D);
 
 

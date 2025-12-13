@@ -1,4 +1,10 @@
 #pragma once
+
+/*
+- v0.01 PBR Direct Lighting (2025/08/15)
+- v0.02 PBR IBL (2025/09/28)
+*/
+
 #include "Math.hlsli"
 
 struct SurfaceData
@@ -110,6 +116,23 @@ float3 PBRLighting(
 
     return lighting;
 }
+
+
+float3 FresnelSchlickWithRoughness(float NdotV, float3 f0, float roughness)
+{
+    float3 r = float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness);
+    return f0 + (max(r, f0) - f0) * pow(saturate(1.0 - NdotV), 5.0);
+}
+
+
+// float3 FresnelSchlickWithRoughness(float3 SpecularColor,float3 E,float3 N,float Gloss)
+// {
+//     return SpecularColor + (max(Gloss, SpecularColor) - SpecularColor) * pow(1 - saturate(dot(E, N)), 5);
+// }
+
+
+
+
 
 /**************************************************************
 Notes:

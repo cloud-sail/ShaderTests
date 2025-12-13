@@ -53,6 +53,11 @@ struct PBRRenderResources
     uint cameraConstantsIndex;
     uint modelConstantsIndex;
     uint lightConstantsIndex;
+
+    uint radianceTextureIndex;
+	uint irradianceTextureIndex;
+	uint brdfLutTextureIndex;
+
     /*
     uint materialConstantsIndex; // #Todo
     struct MaterialConstants
